@@ -5,13 +5,15 @@ Description: Dieses Plugin erstellt eine neue Tabelle "Projekte" in der WordPres
 Version: 0.2
 Author: Katja Ebermann, Holger Ehrmann
 */
+define('TABLE_NAME_MAIN', 'projects');
+define('TABLE_NAME_HELP', 'project_categories');
 
 function wp_projects_db_make_help_table()
 {
     global $wpdb; // Das $wpdb-Objekt beinhaltet die DB-Einstellungen von WP.
     $charset_collate = $wpdb->get_charset_collate(); // $charset_collate enthält den von der WP aktuell genutzten Zeichensatz.
-    $table_name = $wpdb->prefix . 'project_categories';
-    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    $table_name_help = $wpdb->prefix . TABLE_NAME_HELP;
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name_help (
         'project_category_id' INT NOT NULL,
         'project_categorie_name' VARCHAR(45) NOT NULL,
         PRIMARY KEY (`project_category_id`)
@@ -24,8 +26,9 @@ function wp_projects_db_make_main_table()
 {
     global $wpdb; // Das $wpdb-Objekt beinhaltet die DB-Einstellungen von WP.
     $charset_collate = $wpdb->get_charset_collate(); // $charset_collate enthält den von der WP aktuell genutzten Zeichensatz.
-    $table_name = $wpdb->prefix . 'projects';
-    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    $table_name_main = $wpdb->prefix . TABLE_NAME_MAIN;
+    $table_name_help = $wpdb->prefix . TABLE_NAME_HELP;
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name_main (
         'project_id' int NOT NULL AUTO_INCREMENT,
         'name' VARCHAR(50) NOT NULL,
         'email' VARCHAR(998) NOT NULL,
@@ -44,6 +47,7 @@ function wp_projects_db_make_main_table()
         'project_categories_id' INT NOT NULL,
         PRIMARY KEY (project_id)
         FOREIGN KEY (project_category_id)
+        REFERENCES $table_name_help (project_category_id)
         ) $charset_collate;";
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
